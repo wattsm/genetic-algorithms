@@ -46,6 +46,16 @@ forward to the next generation.
 Mutation of timetables is simply removing a course lecture from a slot and creating a new lecture (with randomly assigned
 tutor and room) and assigning it to a slot on the same day.
 
+##### Fitness
+
+A timetable's fitness is the average fitness of its days. The fitness of a day is the average fitness of its slots.
+
+Each slot's fitness is evaluated by course, tutor and room. If a slot has more than the maximum acceptable number of clashes, its fitness is 0. 
+If it has less than its fitness is the the inverse of the percentage of maxmium acceptable clashes - e.g. if the number of acceptable clashes is 4 and a slot
+has 3 then its fitness is 25 (100 - ((3 / 4) * 100))
+
+These fitness values are then multiplied by their weighting to give the total slot fitness.
+
 ### Sandbox
 
 The project GeneticAlgorithms.Sandbox is a console application which can be used to play around with the parameters of the engine. 
