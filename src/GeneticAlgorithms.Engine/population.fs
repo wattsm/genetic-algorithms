@@ -40,25 +40,44 @@ type Population<'i> private (generationNo, individuals, fitnessCalculator : IFit
         //In an elitist model we keep the fittest individual in every generation
         let conserved  = 
             match algorithm.IsElitist with
-            | true -> [ snd (fittest.Force ()); ]
-            | false -> []
+            | true -> Some (snd (fittest.Force ()))
+            | false -> None
 
         //Cross over the population, choosing individuals via tournament selection
-        let rec mix individuals' = 
-            match (List.length individuals') = size with
-            | true -> individuals'
-            | _ -> 
+        let mixPopulation conserved = 
 
-                let newIndividual = 
-                    algorithm.Mix (algorithm.Select individuals) (algorithm.Select individuals)
+            let mixIndividuals () = 
+                async {
+                    
+                    let i1 = algorithm.Select individuals
+                    let i2 = algorithm.Select individuals
 
-                mix (newIndividual :: individuals')
+                    return algorithm.Mix i1 i2
+                }
+
+            let sizeOffset = 
+                match conserved with
+                | Some _ -> 1
+                | None -> 0
+
+            let targetSize = (List.length individuals) - sizeOffset
+
+            let individuals' = 
+                Async.Parallel (Seq.init targetSize (fun _ -> mixIndividuals ()))
+                |> Async.RunSynchronously
+                |> Array.toList
+
+            match conserved with
+            | Some individual -> individual :: individuals'
+            | _ -> individuals'
 
         //Create new set of individuals and then mutate
         let individuals' = 
             conserved
-            |> mix
-            |> List.map algorithm.Mutate
+            |> mixPopulation
+            |> List.toArray
+            |> Array.Parallel.map algorithm.Mutate
+            |> Array.toList
 
         Population ((generationNo + 1), individuals', fitnessCalculator, algorithm)
 

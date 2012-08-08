@@ -41,8 +41,15 @@ type Runner<'i> (settings : RunnerSettings, factory : IFactory<'i>, fitnessCalcu
 
     member this.Run reporter = 
 
+        let create () = 
+            async {
+                return factory.Create ()
+            }
+
         let individuals = 
-            List.init settings.PopulationSize (fun index -> factory.Create ())
+            Async.Parallel (Seq.init settings.PopulationSize (fun _ -> create ()))
+            |> Async.RunSynchronously
+            |> Array.toList            
 
         let population = 
             Population.Create individuals fitnessCalculator algorithm
