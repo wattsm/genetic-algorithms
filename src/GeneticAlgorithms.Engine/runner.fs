@@ -10,8 +10,8 @@ type RunnerSettings = {
 
 type ResultType = 
     | Success
-    | Acceptable
-    | Failure
+    | Acceptable of decimal
+    | Failure of decimal
 
 type Result<'i> = {
     Type : ResultType;
@@ -23,23 +23,23 @@ type Runner<'i> (settings : RunnerSettings, factory : IFactory<'i>, fitnessCalcu
     let (|Complete|_|) (population : Population<'i>) = 
         if (population.GenerationNo = settings.MaxGenerations) then
             if (population.Fitness >= settings.AcceptableFitness) then
-                Some (Acceptable)
+                Some (Acceptable (population.Fitness))
             else
-                Some (Failure)
+                Some (Failure (population.Fitness))
         else if (population.Fitness >= 100m) then
             Some (Success)
         else
             None
 
-    let rec evolve (population : Population<'i>) (reporter : string -> unit) = 
+    let rec evolve (population : Population<'i>) (reporter : int -> 'i -> decimal -> unit) = 
 
-        reporter (String.Format ("Generation {0}, fittest individual \"{1}\" (fitness = {2}).", population.GenerationNo, population.Fittest, population.Fitness))
+        reporter population.GenerationNo population.Fittest population.Fitness
 
         match population with
         | Complete result -> { Type = result; Fittest = population.Fittest; }
         | _ -> evolve (population.Evolve ()) reporter
 
-    member this.Run (reporter : string -> unit) = 
+    member this.Run reporter = 
 
         let individuals = 
             List.init settings.PopulationSize (fun index -> factory.Create ())

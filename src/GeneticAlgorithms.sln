@@ -7,12 +7,20 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneticAlgorithms.Example.S
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneticAlgorithms.Sandbox", "GeneticAlgorithms.Sandbox\GeneticAlgorithms.Sandbox.fsproj", "{77786E58-72C1-4CA7-A684-894F5168DB5E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{2DB62D03-B2FA-4F23-9D12-B2699A30CE7A}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "GeneticAlgorithms.Example.Timetabling", "GeneticAlgorithms.Example.Timetabling\GeneticAlgorithms.Example.Timetabling.fsproj", "{0DEB73FE-5682-440D-A98B-DB8AD92146F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0DEB73FE-5682-440D-A98B-DB8AD92146F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DEB73FE-5682-440D-A98B-DB8AD92146F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DEB73FE-5682-440D-A98B-DB8AD92146F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DEB73FE-5682-440D-A98B-DB8AD92146F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{77786E58-72C1-4CA7-A684-894F5168DB5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{77786E58-72C1-4CA7-A684-894F5168DB5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77786E58-72C1-4CA7-A684-894F5168DB5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -28,5 +36,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0DEB73FE-5682-440D-A98B-DB8AD92146F4} = {2DB62D03-B2FA-4F23-9D12-B2699A30CE7A}
+		{B608BC16-67F0-4E7A-AB36-0C917EEEB950} = {2DB62D03-B2FA-4F23-9D12-B2699A30CE7A}
 	EndGlobalSection
 EndGlobal

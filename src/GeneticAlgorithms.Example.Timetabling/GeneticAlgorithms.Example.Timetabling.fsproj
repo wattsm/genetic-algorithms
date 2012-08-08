@@ -5,12 +5,12 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>77786e58-72c1-4ca7-a684-894f5168db5e</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>GeneticAlgorithms.Sandbox</RootNamespace>
-    <AssemblyName>GeneticAlgorithms.Sandbox</AssemblyName>
+    <ProjectGuid>0deb73fe-5682-440d-a98b-db8ad92146f4</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>GeneticAlgorithms.Example.Timetabling</RootNamespace>
+    <AssemblyName>GeneticAlgorithms.Example.Timetabling</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <Name>GeneticAlgorithms.Sandbox</Name>
+    <Name>GeneticAlgorithms.Example.Timetabling</Name>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -22,7 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Debug\GeneticAlgorithms.Sandbox.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\GeneticAlgorithms.Example.Timetabling.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -33,9 +33,22 @@
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DocumentationFile>bin\Release\GeneticAlgorithms.Sandbox.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\GeneticAlgorithms.Example.Timetabling.XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
+  <ItemGroup>
+    <Compile Include="extensions.fs" />
+    <Compile Include="data.fs" />
+    <Compile Include="clashes.fs" />
+    <Compile Include="utils.fs" />
+    <Compile Include="fitness.fs" />
+    <Compile Include="factory.fs" />
+    <Compile Include="algorithm.fs" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -47,30 +60,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="program.fs" />
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\GeneticAlgorithms.Engine\GeneticAlgorithms.Engine.fsproj">
       <Name>GeneticAlgorithms.Engine</Name>
       <Project>{97941e0c-048a-47c5-ac26-8a4b8cf40541}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\GeneticAlgorithms.Example.Strings\GeneticAlgorithms.Example.Strings.fsproj">
-      <Name>GeneticAlgorithms.Example.Strings</Name>
-      <Project>{b608bc16-67f0-4e7a-ab36-0c917eeeb950}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\GeneticAlgorithms.Example.Timetabling\GeneticAlgorithms.Example.Timetabling.fsproj">
-      <Name>GeneticAlgorithms.Example.Timetabling</Name>
-      <Project>{0deb73fe-5682-440d-a98b-db8ad92146f4}</Project>
-      <Private>True</Private>
-    </ProjectReference>
   </ItemGroup>
-  <PropertyGroup>
-    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
-  </PropertyGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

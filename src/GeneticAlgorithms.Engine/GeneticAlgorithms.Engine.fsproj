@@ -47,6 +47,7 @@
     <Compile Include="population.fs" />
     <Compile Include="factory.fs" />
     <Compile Include="runner.fs" />
+    <Compile Include="tournament.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
