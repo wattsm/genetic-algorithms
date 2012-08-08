@@ -51,6 +51,7 @@ type CourseTimetableAlgorithm (settings, fitness : IFitnessCalculator<Timetable>
             if (Common.random 1 10) = 1 then
 
                 //TODO Selective pressures: don't choose random tutors/rooms that would create a clash if possible
+                //TODO Recessive changes - e.g. changing a lecture which doesn't currently clash.
 
                 let dayNo = Common.random 1 (timetable.Length)
 
