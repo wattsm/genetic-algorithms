@@ -45,3 +45,11 @@ forward to the next generation.
 
 Mutation of timetables is simply removing a course lecture from a slot and creating a new lecture (with randomly assigned
 tutor and room) and assigning it to a slot on the same day.
+
+### Sandbox
+
+The project GeneticAlgorithms.Sandbox is a console application which can be used to play around with the parameters of the engine. 
+
+Currently it is performing timetable generation. A timetable is generating, with information about each generation
+printed to the screen. Once a solution has been found or the maximum number of generations has been reached
+the fittest timetable is rendered as XML to /bin/debug|release/timetable.xml.
