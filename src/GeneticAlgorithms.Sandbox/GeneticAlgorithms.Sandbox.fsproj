@@ -49,6 +49,9 @@
   <ItemGroup>
     <Compile Include="program.fs" />
     <None Include="App.config" />
+    <None Include="timetable.xsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GeneticAlgorithms.Engine\GeneticAlgorithms.Engine.fsproj">

@@ -3,6 +3,7 @@
 open System
 open System.IO
 open System.Xml
+open System.Xml.Xsl
 open GeneticAlgorithms.Engine
 open GeneticAlgorithms.Example.Timetabling
 
@@ -28,6 +29,21 @@ module Program =
 
         path
 
+    let writeTimetableHtml xmlPath = 
+
+        let xslPath = Path.Combine (AppDomain.CurrentDomain.BaseDirectory, "timetable.xsl")
+        let htmlPath = Path.Combine (AppDomain.CurrentDomain.BaseDirectory, "timetable.html")
+
+        if (File.Exists htmlPath) then
+            File.Delete htmlPath
+
+        let stylesheet = XslCompiledTransform ()
+        stylesheet.Load (xslPath)
+
+        stylesheet.Transform (xmlPath, htmlPath)
+
+        htmlPath
+
     let printToConsole generationNo fittest fitness = 
         Console.WriteLine (String.Format("Generation = {0}, Fittest = {1} clashes, Fitness = {2:0.00}", generationNo, (Clashes.countTimetableClashes fittest), fitness))
 
@@ -35,7 +51,7 @@ module Program =
 
         let timetableSettings = {
             Size = 5;
-            CourseCodes = List.init 30 (fun n -> String.Format ("CRS{0}", n));
+            CourseCodes = List.init 25 (fun n -> String.Format ("CRS{0}", n));
             RoomCodes = List.init 20 (fun n -> String.Format ("RM{0}", n)); //Needs to be about # courses / 6
             TutorCodes = List.init 15 (fun n -> String.Format ("T{0}", n)); //Ditto
         }
@@ -65,7 +81,8 @@ module Program =
 
         let runner = Runner (runnerSettings, factory, fitness, algorithm)
         let result = runner.Run printToConsole
-        let path = writeTimetableXml result.Fittest
+        let xmlPath = writeTimetableXml result.Fittest
+        let htmlPath = writeTimetableHtml xmlPath
 
         let msg =
             match result.Type with
@@ -75,7 +92,8 @@ module Program =
 
         printfn "------------------------"
         printfn "Result = %A" msg
-        printfn "Timetable XML = %A" path
+        printfn "Timetable XML = %A" xmlPath
+        printfn "Timetable HTML = %A" htmlPath
         
         Console.ReadLine () |> ignore
 
