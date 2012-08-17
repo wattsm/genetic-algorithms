@@ -24,16 +24,17 @@ type TimetableFactory (settings) =
 
         locations
         |> List.collect (Rooms.findRooms requirements)
+        |> List.zip locations   //TODO Find a better way of doing this
         |> randomItem
 
     let eventsFor (lessons : Lesson list) = 
         lessons
         |> List.map (fun lesson -> 
 
-                let room = 
+                let location, room = 
                     randomRoomFor lesson
 
-                { ModuleCode = lesson.ModuleCode; LessonCode = lesson.LessonCode; RoomCode = room.RoomCode; }
+                { ModuleCode = lesson.ModuleCode; LessonCode = lesson.LessonCode; RoomCode = room.RoomCode; LocationCode = location.LocationCode }
             )
 
     let addEventsFor week lessons = 
@@ -60,9 +61,6 @@ type TimetableFactory (settings) =
         Lessons.organiseLessons week.WeekNo settings
         |> List.fold addEventsFor week
 
-    let empty = 
-        { StartWeek = settings.StartWeek; EndWeek = settings.EndWeek; Weeks = []; }
-
     (* Static factory method *)
     static member Create settings = 
         TimetableFactory (settings) :> IFactory<Timetable>
@@ -73,4 +71,4 @@ type TimetableFactory (settings) =
         member this.Create () = 
             [for weekNo in settings.StartWeek .. settings.EndWeek -> Week.Empty weekNo settings]
             |> List.map addEventsTo
-            |> List.fold Timetables.replaceWeek empty
+            |> List.fold Timetables.replaceWeek (Timetable.Empty settings)

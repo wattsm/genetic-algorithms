@@ -11,6 +11,7 @@ module Xml =
         writer.WriteElementString ("Module", event.ModuleCode)
         writer.WriteElementString ("Lesson", event.LessonCode)
         writer.WriteElementString ("Room", event.RoomCode)
+        writer.WriteElementString ("Location", event.LocationCode)
         writer.WriteEndElement ()
 
     let writeSlot (writer : XmlWriter) (slot : Slot) = 

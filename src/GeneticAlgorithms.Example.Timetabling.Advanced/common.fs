@@ -15,6 +15,7 @@ module Common =
         let index = 
             list
             |> List.length 
+            |> ((-) 1)
             |> (random 0)
 
         List.nth list index
@@ -30,7 +31,7 @@ module Common =
                 else
                     h
 
-            h :: (replaceItem item selector t)
+            h' :: (replaceItem item selector t)
 
 
     let rec satisfiesAll predicates item = 

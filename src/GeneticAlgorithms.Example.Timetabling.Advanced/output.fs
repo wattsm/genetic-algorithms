@@ -6,6 +6,7 @@ type Event = {
     ModuleCode : string;
     LessonCode : string;
     RoomCode : string;
+    LocationCode : string;
 }
 
 type Slot = {

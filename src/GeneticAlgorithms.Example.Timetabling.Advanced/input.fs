@@ -26,8 +26,8 @@ type Lesson = {
 type Module = {
     ModuleCode : string;
     ClassSize : int;
-    Lessons : Lesson list;
     GroupCode : string option;
+    Lessons : Lesson list;    
 }
 
 type TimetableSettings = {
