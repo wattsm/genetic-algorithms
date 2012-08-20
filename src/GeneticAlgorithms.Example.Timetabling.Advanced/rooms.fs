@@ -4,6 +4,17 @@ open System
 
 module Rooms = 
 
+    let rec countRooms (locations : Location list) = 
+        locations
+        |> List.map (fun l -> 
+
+                (List.length l.Rooms) + (countRooms l.Locations)
+
+
+            )
+        |> List.sum
+        
+
     let ofType typeCode room = 
         room.TypeCode = typeCode
 

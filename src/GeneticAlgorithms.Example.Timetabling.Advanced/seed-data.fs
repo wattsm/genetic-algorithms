@@ -10,13 +10,13 @@ module SeedData =
         let MaxRooms = 5
         let MinLessons = 1
         let MaxLessons = 10
-        let LessonGroupFrequency = 0.3m
+        let LessonGroupFrequency = 0.1m
         let LessonLocationFrequency = 0.2m
         let ModuleGroupFrequence = 0.3m
-        let MinRoomCapacityUnits = 1
+        let MinRoomCapacityUnits = 4
         let MaxRoomCapacityUnits = 10
         let RoomCapacityUnit = 5
-        let MinClassSize = 1
+        let MinClassSize = 15
         let MaxClassSize = 35
 
     let private randomChoice (freq : decimal) = 

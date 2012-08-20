@@ -4,6 +4,15 @@ open System
 
 module Locations =
 
+    let rec countLocations (locations : Location list) = 
+        locations
+        |> List.map (fun l -> 
+
+                1 + (countLocations l.Locations)
+
+            )
+        |> List.sum
+
     let findLocation settings locationCode = 
         
         let rec find locationCode (locations : Location list) =

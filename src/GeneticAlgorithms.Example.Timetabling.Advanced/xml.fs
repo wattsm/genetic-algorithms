@@ -14,10 +14,19 @@ module Xml =
         writer.WriteElementString ("Location", event.LocationCode)
         writer.WriteEndElement ()
 
-    let writeSlot (writer : XmlWriter) (slot : Slot) = 
+    let writeSlot (writer : XmlWriter) settings (slot : Slot) = 
+
+        let moduleClashes = Modules.moduleClashes settings slot
+        let roomClashes = Rooms.roomClashes slot
 
         writer.WriteStartElement "Slot"
         writer.WriteAttributeString ("Number", (slot.SlotNo.ToString ()))
+
+        if (moduleClashes > 0) then
+            writer.WriteAttributeString ("ModuleClashes", (string moduleClashes))
+
+        if (roomClashes > 0) then
+            writer.WriteAttributeString ("RoomClashes", (string roomClashes))
 
         writer.WriteStartElement "Events"
 
@@ -27,7 +36,7 @@ module Xml =
         writer.WriteEndElement ()
         writer.WriteEndElement ()
 
-    let writeDay (writer : XmlWriter) (day : WeekDay) = 
+    let writeDay (writer : XmlWriter) settings (day : WeekDay) = 
         
         writer.WriteStartElement "WeekDay"
         writer.WriteAttributeString ("Day", (day.Day.ToString ()))
@@ -35,12 +44,12 @@ module Xml =
         writer.WriteStartElement "Slots"
 
         day.Slots
-        |> List.iter (writeSlot writer)
+        |> List.iter (writeSlot writer settings)
 
         writer.WriteEndElement ()
         writer.WriteEndElement ()
 
-    let writeWeek (writer : XmlWriter) (week : Week) =
+    let writeWeek (writer : XmlWriter) settings (week : Week) =
 
         writer.WriteStartElement "Week"
         writer.WriteAttributeString ("Number", (week.WeekNo.ToString ()))
@@ -48,18 +57,18 @@ module Xml =
         writer.WriteStartElement "Days"
 
         week.Days
-        |> List.iter (writeDay writer)
+        |> List.iter (writeDay writer settings)
 
         writer.WriteEndElement ()
         writer.WriteEndElement ()
 
-    let writeTimetable (writer : XmlWriter) (timetable : Timetable) = 
+    let writeTimetable (writer : XmlWriter) settings (timetable : Timetable) = 
 
         writer.WriteStartElement "Timetable"
         writer.WriteStartElement "Weeks"
 
         timetable.Weeks
-        |> List.iter (writeWeek writer)
+        |> List.iter (writeWeek writer settings)
 
         writer.WriteEndElement ()
         writer.WriteEndElement ()

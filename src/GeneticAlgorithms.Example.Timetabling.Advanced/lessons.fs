@@ -4,6 +4,11 @@ open System
 
 module Lessons = 
 
+    let countLessons (modules : Module list) = 
+        modules
+        |> List.map (fun m -> List.length m.Lessons)
+        |> List.sum        
+
     let isActiveFor weekNo (lesson : Lesson) = 
         lesson.Weeks
         |> List.exists ((=) weekNo)
