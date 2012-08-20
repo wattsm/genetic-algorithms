@@ -3,6 +3,7 @@
 open System
 open System.Xml
 open System.IO
+open GeneticAlgorithms.Engine
 open GeneticAlgorithms.Example.Timetabling.Advanced
 open GeneticAlgorithms.Example.Timetabling.Advanced.Xml
 
@@ -24,6 +25,9 @@ module AdvancedTimetable =
         Xml.writeTimetable writer timetable
 
         path   
+
+    let report generationNo timetable fitness = 
+        printfn "Generation %A (fitness = %M)" generationNo fitness
 
     let run () =
 
@@ -72,18 +76,40 @@ module AdvancedTimetable =
         let factory =
             TimetableFactory.Create timetableSettings
 
-        let timetable = 
-            factory.Create ()
-
         let calculator = 
             TimetableFitnessCalculator.Create fitnessSettings timetableSettings
 
-        let fitness =
-            calculator.CalculateFitness timetable
+        let algorithmSettings = {
+            IsElitist = true;
+            TimetableSettings = timetableSettings;
+            FitnessCalculator = calculator;
+            TournamentSize = 5;
+        }
 
-        printfn "Fitness = %M" fitness
-        printfn "# module clashes = %A" (Timetables.moduleClashes timetableSettings timetable)
-        printfn "# room clashes = %A" (Timetables.roomClashes timetable)
-        printfn "XML @ %A" (writeXml timetable)
+        let algorithm = 
+            TimetableAlgorithm.Create algorithmSettings
+
+        let runnerSettings = {
+            PopulationSize = 10;
+            MaxGenerations = 10;
+            AcceptableFitness = 80m;
+        }
+
+        printfn "Beginning evolution..."
+
+        let runner = 
+            Runner<Timetable> (runnerSettings, factory, calculator, algorithm)
+
+        let result = 
+            runner.Run report
+
+        printfn "Result = %A" result.Type
+
+        printfn "Fitness = %M" (calculator.CalculateFitness result.Fittest)
+        printfn "# module clashes = %A" (Timetables.moduleClashes timetableSettings result.Fittest)
+        printfn "# room clashes = %A" (Timetables.roomClashes result.Fittest)
+
+        printfn "Writing XML timetable..."
+        printfn "XML @ %A" (writeXml result.Fittest)
 
         Console.ReadLine () |> ignore
