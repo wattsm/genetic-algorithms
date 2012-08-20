@@ -47,3 +47,9 @@ module Timetables =
         timetable.Weeks
         |> List.collect (fun week -> week.Days)
         |> List.collect (fun day -> day.Slots)
+
+    let roomClashes = 
+        flatten >> (List.map Rooms.roomClashes) >> List.sum
+
+    let moduleClashes settings =
+        flatten >> (List.map (Modules.moduleClashes settings)) >> List.sum

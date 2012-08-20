@@ -23,18 +23,24 @@ type TimetableFactory (settings) =
             ]
 
         locations
-        |> List.collect (Rooms.findRooms requirements)
-        |> List.zip locations   //TODO Find a better way of doing this
-        |> randomItem
+        |> List.collect (fun l -> 
+
+                Rooms.findRooms requirements l
+                |> List.map (fun r -> (l.LocationCode, r.RoomCode))
+
+            )
+        |> randomItemOrNone
 
     let eventsFor (lessons : Lesson list) = 
         lessons
         |> List.map (fun lesson -> 
 
-                let location, room = 
-                    randomRoomFor lesson
+                let locationCode, roomCode = 
+                    match (randomRoomFor lesson) with
+                    | None -> ("", "")
+                    | Some (lc, rc) -> (lc, rc)
 
-                { ModuleCode = lesson.ModuleCode; LessonCode = lesson.LessonCode; RoomCode = room.RoomCode; LocationCode = location.LocationCode }
+                { ModuleCode = lesson.ModuleCode; LessonCode = lesson.LessonCode; RoomCode = roomCode; LocationCode = locationCode }
             )
 
     let addEventsFor week lessons = 

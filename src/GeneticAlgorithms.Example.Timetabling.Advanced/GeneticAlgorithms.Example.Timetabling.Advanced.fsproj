@@ -61,6 +61,7 @@
     <Compile Include="xml.fs" />
     <Compile Include="fitness.fs" />
     <Compile Include="factory.fs" />
+    <Compile Include="seed-data.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

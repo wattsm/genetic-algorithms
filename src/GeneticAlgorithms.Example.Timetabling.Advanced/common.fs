@@ -10,15 +10,26 @@ module Common =
     let random min max = 
         rnd.Next (min, (max + 1))
 
+    let (--) i = 
+        i - 1
+
+    let randomItemOrNone list = 
+        match list with
+        | [] ->  None
+        | _ -> 
+
+            let index = 
+                list
+                |> List.length 
+                |> (--)
+                |> (random 0)
+
+            Some (List.nth list index)
+
     let randomItem list = 
-
-        let index = 
-            list
-            |> List.length 
-            |> ((-) 1)
-            |> (random 0)
-
-        List.nth list index
+        match (randomItemOrNone list) with
+        | None -> raise (ArgumentException ())
+        | Some item -> item
 
     let rec replaceItem item selector list = 
         match list with

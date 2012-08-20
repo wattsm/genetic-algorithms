@@ -23,85 +23,40 @@ module AdvancedTimetable =
 
         Xml.writeTimetable writer timetable
 
-        path        
-
-    let rec createRandomLocations count depth parent = 
-
-        let createRandomChildren parent = 
-            if depth > 3 then
-                []
-            else            
-                createRandomLocations (random 1 10) (depth + 1) parent
-
-        [ 1 .. count ]
-        |> List.map (fun n -> 
-
-                let code = 
-                    match parent with
-                    | Some n' -> String.Format ("LOC-{0}/{1}", n', n)
-                    | _ -> String.Format ("LOC-{0}", n)
-
-                { 
-                    LocationCode = code;
-                    Rooms = [];
-                    Locations = createRandomChildren (Some n);
-                }
-
-            )
+        path   
 
     let run () =
 
-        let rooms = 
-            [
-                {
-                    RoomCode = "RM001";
-                    TypeCode = "T001";
-                    Capacity = 100;
-                };
-                {
-                    RoomCode = "RM002";
-                    TypeCode = "T002";
-                    Capacity = 50;
-                }
-            ]
+        printfn "Generating seed data..."
+
+        let roomTypeCodes = 
+            SeedData.generateRandomTypeCodes 10
 
         let locations = 
-            [
-                {
-                    LocationCode = "LC001";
-                    Rooms = rooms;
-                    Locations = [];
-                }
-            ]
+            SeedData.generateRandomLocations roomTypeCodes 25
 
-        let locations' = 
-            createRandomLocations 50 0 None
+        let lessonGroupCodes = 
+            SeedData.generateRandomGroupCodes "L" 10
+
+        let moduleGroupCodes = 
+            SeedData.generateRandomGroupCodes "M" 10
+
+        let weekPatterns = 
+            [
+                [1 .. 25];
+                [30 .. 52];
+            ]
 
         let modules = 
-            [
-                {
-                    ModuleCode = "M001";
-                    ClassSize = 75;
-                    GroupCode = Some "GRP001";
-                    Lessons = 
-                        [
-                            {
-                                LessonCode = "L001";
-                                ModuleCode = "M001";
-                                GroupCode  = None;
-                                RoomTypeCode = "T001";
-                                LocationCode = Some "LC001";
-                                Weeks = [ 1; 2; 3; 4; 5; ];
-                            };
-                        ];
-                };
-            ]
-        
+            SeedData.generateRandomModules 50 roomTypeCodes locations lessonGroupCodes moduleGroupCodes weekPatterns
+
+        printfn "Done."
+
         let timetableSettings = {
             Modules = modules;
             Locations = locations;
             StartWeek = 1;
-            EndWeek = 10;
+            EndWeek = 52;
             SlotsPerDay = 6;
         }
 
@@ -126,7 +81,9 @@ module AdvancedTimetable =
         let fitness =
             calculator.CalculateFitness timetable
 
-        printfn "Fitness = %A" fitness
+        printfn "Fitness = %M" fitness
+        printfn "# module clashes = %A" (Timetables.moduleClashes timetableSettings timetable)
+        printfn "# room clashes = %A" (Timetables.roomClashes timetable)
         printfn "XML @ %A" (writeXml timetable)
 
         Console.ReadLine () |> ignore

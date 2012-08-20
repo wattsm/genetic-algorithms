@@ -30,7 +30,7 @@ module Rooms =
 
     //TODO Convert timetable data to arrays and parallelise?
 
-    let slotClashes slot = 
+    let roomClashes slot = 
         if (List.length slot.Events) <= 1 then
             0
         else

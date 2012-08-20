@@ -29,7 +29,7 @@ type TimetableFitnessCalculator (fs, ts) =
 
     let roomFitness timetable = 
         (flatten timetable)
-        |> List.map (slotClashes >> (clashFitness fs.MaxClashes))
+        |> List.map (roomClashes >> (clashFitness fs.MaxClashes))
         |> List.average
 
     let moduleFitness timetable = 
