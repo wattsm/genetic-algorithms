@@ -2,7 +2,8 @@
 
 open System
 
-module Rooms = 
+module Rooms =     
+        
 
     let rec countRooms (locations : Location list) = 
         locations

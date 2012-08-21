@@ -51,13 +51,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="common.fs" />
-    <Compile Include="input.fs" />
-    <Compile Include="output.fs" />
+    <Compile Include="input-data.fs" />
+    <Compile Include="output-data.fs" />
     <Compile Include="rooms.fs" />
     <Compile Include="locations.fs" />
     <Compile Include="lessons.fs" />
     <Compile Include="modules.fs" />
     <Compile Include="timetables.fs" />
+    <Compile Include="internal-data.fs" />
     <Compile Include="xml.fs" />
     <Compile Include="fitness.fs" />
     <Compile Include="scheduling.fs" />

@@ -5,46 +5,20 @@ open GeneticAlgorithms.Example.Timetabling.Advanced.Timetables
 
 module Scheduling = 
 
-    let randomRoomFor settings (lesson : Lesson) = 
-
-        let classSize = Modules.getClassSize settings lesson.ModuleCode
-
-        let locations = 
-            match lesson.LocationCode with
-            | Some locationCode -> [ (Locations.findLocation settings locationCode); ]
-            | _ -> settings.Locations
-
-        let requirements =
-            [
-                (Rooms.ofType lesson.RoomTypeCode);
-                (Rooms.withCapacity classSize);
-            ]
-
-        locations
-        |> List.collect (fun l -> 
-
-                Rooms.findRooms requirements l
-                |> List.map (fun r -> (l.LocationCode, r.RoomCode))
-
-            )
-        |> randomItemOrNone
-
-    let eventsFor settings (lessons : Lesson list) = 
+    let eventsFor (settings : Denormalised.Settings) (lessons : Lesson list) = 
         lessons
         |> List.map (fun lesson -> 
 
-                let locationCode, roomCode = 
-                    match (randomRoomFor settings lesson) with
-                    | None -> ("", "")
-                    | Some (lc, rc) -> (lc, rc)
+                let locationCode, roomCode =
+                    randomItem settings.RoomsByLocation
 
                 { ModuleCode = lesson.ModuleCode; LessonCode = lesson.LessonCode; RoomCode = roomCode; LocationCode = locationCode }
             )
 
-    let addGroupedEvents settings week lessons = 
+    let addGroupedEvents (settings : TimetableSettings) settings' week lessons = 
 
         let events = 
-            eventsFor settings lessons
+            eventsFor settings' lessons
 
         let dayOfWeek = enum<DayOfWeek> (random 1 5)
         let slotNo = random 1 settings.SlotsPerDay
@@ -61,9 +35,9 @@ module Scheduling =
         week
         |> replaceDay (day |> replaceSlot slot)
 
-    let addLessonEvents settings week = 
+    let addLessonEvents settings settings' week = 
         Lessons.organiseWeekLessons week.WeekNo settings
-        |> List.fold (addGroupedEvents settings) week
+        |> List.fold (addGroupedEvents settings settings') week
 
     let removeModuleEvents moduleCode (timetable : Timetable) = 
 
@@ -78,12 +52,12 @@ module Scheduling =
 
         { timetable with Weeks = (List.map removeWeekEvents timetable.Weeks); }
 
-    let addModuleEvents (settings : TimetableSettings) (module' : Module) (timetable : Timetable)  = 
+    let addModuleEvents (settings : TimetableSettings) settings' (module' : Module) (timetable : Timetable)  = 
 
         let addWeekLessons week = 
             module'.Lessons
             |> List.filter (Lessons.isActiveFor week.WeekNo)
             |> Lessons.createLessonGroups
-            |> List.fold (addGroupedEvents settings) week
+            |> List.fold (addGroupedEvents settings settings') week
         
         { timetable with Weeks = (List.map addWeekLessons timetable.Weeks); }

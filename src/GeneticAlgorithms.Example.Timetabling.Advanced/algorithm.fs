@@ -17,10 +17,13 @@ type AlgorithmSettings = {
 
 type TimetableAlgorithm (settings : AlgorithmSettings)  =
 
+    let settings' = 
+        Denormalised.getSettings settings.TimetableSettings
+
     let mutateByWeek timetable =
 
             let weekNo = random timetable.StartWeek timetable.EndWeek
-            let week = Scheduling.addLessonEvents settings.TimetableSettings (Week.Empty weekNo settings.TimetableSettings)
+            let week = Scheduling.addLessonEvents settings.TimetableSettings settings' (Week.Empty weekNo settings.TimetableSettings)
 
             Timetables.replaceWeek timetable week
 
@@ -33,7 +36,7 @@ type TimetableAlgorithm (settings : AlgorithmSettings)  =
             Scheduling.removeModuleEvents module'.ModuleCode
 
         let addEvents =
-            Scheduling.addModuleEvents settings.TimetableSettings module'
+            Scheduling.addModuleEvents settings.TimetableSettings settings' module'
 
         removeEvents >> addEvents
 
