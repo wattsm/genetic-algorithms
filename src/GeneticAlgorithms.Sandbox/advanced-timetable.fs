@@ -34,13 +34,13 @@ module AdvancedTimetable =
         printfn "Generating seed data..."
 
         let roomTypeCodes = 
-            SeedData.generateRandomTypeCodes 10
+            SeedData.generateRandomTypeCodes 3
 
         let locations = 
             SeedData.generateRandomLocations roomTypeCodes 50
 
         let lessonGroupCodes = 
-            SeedData.generateRandomGroupCodes "L" 20
+            SeedData.generateRandomGroupCodes "L" 50
 
         let moduleGroupCodes = 
             SeedData.generateRandomGroupCodes "M" 10

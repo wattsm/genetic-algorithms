@@ -5,10 +5,20 @@ open System.Xml
 
 module Xml = 
 
-    let writeEvent (writer : XmlWriter) (event : Event)  = 
+    let writeEvent (writer : XmlWriter) settings (event : Event)  = 
+
+        let groupCode = 
+            settings.Modules
+            |> List.find (fun m -> m.ModuleCode = event.ModuleCode)
+            |> (fun m -> m.GroupCode)
         
         writer.WriteStartElement "Event"
         writer.WriteElementString ("Module", event.ModuleCode)
+
+        match groupCode with
+        | Some code -> writer.WriteElementString ("Group", code)
+        | _ -> ()
+
         writer.WriteElementString ("Lesson", event.LessonCode)
         writer.WriteElementString ("Room", event.RoomCode)
         writer.WriteElementString ("Location", event.LocationCode)
@@ -31,7 +41,7 @@ module Xml =
         writer.WriteStartElement "Events"
 
         slot.Events
-        |> List.iter (writeEvent writer)
+        |> List.iter (writeEvent writer settings)
 
         writer.WriteEndElement ()
         writer.WriteEndElement ()

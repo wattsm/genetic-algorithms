@@ -41,10 +41,7 @@ module Scheduling =
                 { ModuleCode = lesson.ModuleCode; LessonCode = lesson.LessonCode; RoomCode = roomCode; LocationCode = locationCode }
             )
 
-    let addEventsFor settings week lessons = 
-
-        let events = 
-            eventsFor settings lessons
+    let addEvent settings week event =
 
         let dayOfWeek = enum<DayOfWeek> (random 1 5)
         let slotNo = random 1 settings.SlotsPerDay
@@ -56,10 +53,14 @@ module Scheduling =
         let slot =
             day
             |> slotAt slotNo
-            |> addEvents events
+            |> addEvents [ event; ]
 
         week
         |> replaceDay (day |> replaceSlot slot)
+
+    let addEventsFor settings week lessons = 
+        eventsFor settings lessons
+        |> List.fold (addEvent settings) week
 
     let addEventsTo settings week = 
         Lessons.organiseLessons week.WeekNo settings

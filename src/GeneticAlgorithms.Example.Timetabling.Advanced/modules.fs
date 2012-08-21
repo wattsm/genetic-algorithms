@@ -1,53 +1,40 @@
 ﻿namespace GeneticAlgorithms.Example.Timetabling.Advanced
 
 open System
+open System.Collections.Generic
 
 module Modules = 
 
-    //TODO Memoise these?
-
-    let getGroupMembers settings moduleCode = 
+    //TODO Add ModuleGroupCode to Event
+    let getGroupCode =
         
-        let m = 
-            settings.Modules
-            |> List.find (fun m' -> m'.ModuleCode = moduleCode)
+        let cache = Dictionary<_,_> (StringComparer.OrdinalIgnoreCase)
 
-        match m.GroupCode with
-        | None -> None
-        | Some groupCode ->
+        fun settings  moduleCode -> 
+            if (cache.ContainsKey moduleCode) then
+                cache.[moduleCode]
+            else
+                
+                let code = 
+                    settings.Modules
+                    |> List.find (fun m -> m.ModuleCode = moduleCode)
+                    |> (fun m -> m.GroupCode)
 
-            let members = 
-                settings.Modules
-                |> List.choose (fun m -> 
-                        match m.GroupCode with
-                        | Some groupCode' when groupCode' = groupCode -> Some m.ModuleCode
-                        | _ -> None
-                    )
+                cache.Add (moduleCode, code)
 
-            Some members        
+                code  
 
     let moduleClashes settings slot = 
         if (List.length slot.Events) <= 1 then
             0
         else
             
-            let otherModules moduleCode = 
-                slot.Events
-                |> List.filter (fun event -> event.ModuleCode <> moduleCode)
-                |> List.map (fun event -> event.ModuleCode)
-
-            let isClashing moduleCode = 
-                match (getGroupMembers settings moduleCode) with
-                | None -> false
-                | Some members ->
-
-                    (otherModules moduleCode)
-                    |> List.exists (fun code -> List.exists (fun code' -> code' = code) members)
-
             slot.Events
-            |> List.map (fun event -> isClashing event.ModuleCode)
-            |> List.filter id
-            |> List.length
+            |> List.choose (fun event -> getGroupCode settings event.ModuleCode)
+            |> List.toSeq   
+            |> Seq.countBy id
+            |> Seq.filter (fun (_, count) -> (count > 1))
+            |> Seq.length
 
     let getClassSize settings moduleCode = 
 
