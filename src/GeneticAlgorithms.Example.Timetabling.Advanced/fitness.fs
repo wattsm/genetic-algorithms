@@ -15,33 +15,32 @@ type ClashWeights = {
 
 type FitnessSettings = {
     Weights : ClashWeights;
-    MaxClashes : int;
 }
 
 [<AutoOpen>]
 module private Fitness = 
 
-    let clashFitness (maxClashes : int) (numClashes : int)  = 
-        if (numClashes >= maxClashes) then
-            0m
+    let clashFitness (numClashes : int)  = 
+        if (numClashes = 0) then
+            1m
         else
-            100m - ((decimal numClashes / decimal maxClashes) * 100m)
+            1m / (decimal numClashes)
 
 type TimetableFitnessCalculator (fs, ts) = 
 
     let roomFitness slots = 
         slots
-        |> List.map (roomClashes >> (clashFitness fs.MaxClashes))
+        |> List.map (roomClashes >> clashFitness)
         |> List.average
 
     let moduleFitness slots = 
         slots
-        |> List.map ((moduleClashes ts) >> (clashFitness fs.MaxClashes))
+        |> List.map ((moduleClashes ts) >> clashFitness)
         |> List.average
 
     let lessonFitness slots = 
         slots
-        |> List.map ((lessonClashes ts) >> (clashFitness fs.MaxClashes))
+        |> List.map ((lessonClashes ts) >> clashFitness)
         |> List.average
 
     do

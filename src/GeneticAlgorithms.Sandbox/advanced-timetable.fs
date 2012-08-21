@@ -79,10 +79,9 @@ module AdvancedTimetable =
             Weights = 
                 {
                     Rooms = 0.3m;
-                    Modules = 0.45m;
-                    Lessons = 0.25m
+                    Modules = 0.25m;
+                    Lessons = 0.45m
                 };
-            MaxClashes = 2;
         }
 
         let factory =
@@ -105,7 +104,7 @@ module AdvancedTimetable =
         let runnerSettings = {
             PopulationSize = populationSize;
             MaxGenerations = 20;
-            AcceptableFitness = 80m;
+            AcceptableFitness = 0.9m;
         }
 
         printfn "Beginning evolution..."
