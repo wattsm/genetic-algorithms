@@ -5,7 +5,6 @@ open System.Collections.Generic
 
 module Modules = 
 
-    //TODO Add ModuleGroupCode to Event
     let getGroupCode =
         
         let cache = Dictionary<_,_> (StringComparer.OrdinalIgnoreCase)
@@ -28,13 +27,18 @@ module Modules =
         if (List.length slot.Events) <= 1 then
             0
         else
-            
+
+            (**
+                A module clash is two modules from the same group scheduled
+                at the same time.
+            **)
             slot.Events
-            |> List.choose (fun event -> getGroupCode settings event.ModuleCode)
-            |> List.toSeq   
+            |> List.toSeq
+            |> Seq.map (fun event -> event.ModuleCode)
+            |> Seq.distinct
+            |> Seq.choose (getGroupCode settings)
             |> Seq.countBy id
-            |> Seq.filter (fun (_, count) -> (count > 1))
-            |> Seq.length
+            |> Seq.sumBy (fun (_, count) -> (count - 1)) //Events can't clash with themselves
 
     let getClassSize settings moduleCode = 
 

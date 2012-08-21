@@ -41,7 +41,10 @@ module Scheduling =
                 { ModuleCode = lesson.ModuleCode; LessonCode = lesson.LessonCode; RoomCode = roomCode; LocationCode = locationCode }
             )
 
-    let addEvent settings week event =
+    let addGroupedEvents settings week lessons = 
+
+        let events = 
+            eventsFor settings lessons
 
         let dayOfWeek = enum<DayOfWeek> (random 1 5)
         let slotNo = random 1 settings.SlotsPerDay
@@ -53,15 +56,34 @@ module Scheduling =
         let slot =
             day
             |> slotAt slotNo
-            |> addEvents [ event; ]
+            |> addEvents events
 
         week
         |> replaceDay (day |> replaceSlot slot)
 
-    let addEventsFor settings week lessons = 
-        eventsFor settings lessons
-        |> List.fold (addEvent settings) week
+    let addLessonEvents settings week = 
+        Lessons.organiseWeekLessons week.WeekNo settings
+        |> List.fold (addGroupedEvents settings) week
 
-    let addEventsTo settings week = 
-        Lessons.organiseLessons week.WeekNo settings
-        |> List.fold (addEventsFor settings) week
+    let removeModuleEvents moduleCode (timetable : Timetable) = 
+
+        let removeSlotEvents slot = 
+            { slot with Events = (List.filter (fun e -> e.ModuleCode <> moduleCode) slot.Events); }
+
+        let removeDayEvents day = 
+            {  day with Slots = (List.map removeSlotEvents day.Slots); }
+
+        let removeWeekEvents week = 
+            { week with Days = (List.map removeDayEvents week.Days); }
+
+        { timetable with Weeks = (List.map removeWeekEvents timetable.Weeks); }
+
+    let addModuleEvents (settings : TimetableSettings) (module' : Module) (timetable : Timetable)  = 
+
+        let addWeekLessons week = 
+            module'.Lessons
+            |> List.filter (Lessons.isActiveFor week.WeekNo)
+            |> Lessons.createLessonGroups
+            |> List.fold (addGroupedEvents settings) week
+        
+        { timetable with Weeks = (List.map addWeekLessons timetable.Weeks); }

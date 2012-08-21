@@ -53,3 +53,6 @@ module Timetables =
 
     let moduleClashes settings =
         flatten >> (List.map (Modules.moduleClashes settings)) >> List.sum
+
+    let lessonClashes settings = 
+        flatten >> (List.map (Lessons.lessonClashes settings)) >> List.sum  

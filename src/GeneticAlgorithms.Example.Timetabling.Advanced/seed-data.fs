@@ -9,18 +9,15 @@ module SeedData =
         let MinRooms = 1
         let MaxRooms = 5
         let MinLessons = 1
-        let MaxLessons = 10
-        let LessonGroupFrequency = 0.1m
-        let LessonLocationFrequency = 0.2m
-        let ModuleGroupFrequence = 0.2m
+        let MaxLessons = 3
+        let LessonGroupFrequency = 0.25m
+        let LessonLocationFrequency = 0.5m
+        let ModuleGroupFrequence = 0.25m
         let MinRoomCapacityUnits = 4
         let MaxRoomCapacityUnits = 10
         let RoomCapacityUnit = 5
         let MinClassSize = 15
-        let MaxClassSize = 35
-
-    let private randomChoice (freq : decimal) = 
-        (random 1 100) >= int (freq * 100m)
+        let MaxClassSize = 35    
 
     let generateRandomTypeCodes count = 
         List.init count (fun i -> String.Format ("T{0}", (string i)))
@@ -60,7 +57,10 @@ module SeedData =
     let generateRandomGroupCodes (prefix : string) count = 
         List.init count (fun i -> String.Format ("{0}-GRP-{1}", prefix, (string i)))
 
-    let generateRandomLessons (moduleCode : string) (roomTypeCodes : string list) (locationCodes : string list) (groupCodes : string list) (weekPatterns : int list list) =
+    let generateRandomLessons (moduleCode : string) (roomTypeCodes : string list) (locationCodes : string list) (weekPatterns : int list list) =
+
+        let groupCodes = 
+            generateRandomGroupCodes moduleCode (Settings.MaxLessons / 2)
 
         let generate n = 
 
@@ -84,7 +84,7 @@ module SeedData =
 
         List.init (random Settings.MinLessons Settings.MaxLessons) generate
 
-    let generateRandomModules count (roomTypeCodes : string list) (locations : Location list) (lessonGroupCodes : string list) (moduleGroupCodes : string list) (weekPatterns : int list list) =
+    let generateRandomModules count (roomTypeCodes : string list) (locations : Location list) (moduleGroupCodes : string list) (weekPatterns : int list list) =
         
         let locationCodes = 
             
@@ -107,7 +107,7 @@ module SeedData =
                 else
                     None
 
-            let lessons = generateRandomLessons code roomTypeCodes locationCodes lessonGroupCodes weekPatterns
+            let lessons = generateRandomLessons code roomTypeCodes locationCodes weekPatterns
 
             { ModuleCode = code; ClassSize = classSize; GroupCode = groupCode; Lessons = lessons; }
 

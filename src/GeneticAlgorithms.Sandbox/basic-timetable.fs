@@ -44,7 +44,7 @@ module BasicTimetable =
 
         htmlPath
 
-    let printToConsole generationNo fittest fitness = 
+    let printToConsole generationNo generationTime fittest fitness = 
         Console.WriteLine (String.Format("Generation = {0}, Fittest = {1} clashes, Fitness = {2:0.00}", generationNo, (Clashes.countTimetableClashes fittest), fitness))
 
     let run () =

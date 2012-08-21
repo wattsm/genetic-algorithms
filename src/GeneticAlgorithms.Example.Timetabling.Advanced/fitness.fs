@@ -5,10 +5,12 @@ open GeneticAlgorithms.Engine
 open GeneticAlgorithms.Example.Timetabling.Advanced.Timetables
 open GeneticAlgorithms.Example.Timetabling.Advanced.Rooms
 open GeneticAlgorithms.Example.Timetabling.Advanced.Modules
+open GeneticAlgorithms.Example.Timetabling.Advanced.Lessons
 
 type ClashWeights = {
     Rooms : decimal;
     Modules : decimal;
+    Lessons : decimal;
 }
 
 type FitnessSettings = {
@@ -27,19 +29,24 @@ module private Fitness =
 
 type TimetableFitnessCalculator (fs, ts) = 
 
-    let roomFitness timetable = 
-        (flatten timetable)
+    let roomFitness slots = 
+        slots
         |> List.map (roomClashes >> (clashFitness fs.MaxClashes))
         |> List.average
 
-    let moduleFitness timetable = 
-        (flatten timetable)
+    let moduleFitness slots = 
+        slots
         |> List.map ((moduleClashes ts) >> (clashFitness fs.MaxClashes))
         |> List.average
 
+    let lessonFitness slots = 
+        slots
+        |> List.map ((lessonClashes ts) >> (clashFitness fs.MaxClashes))
+        |> List.average
+
     do
-        if (fs.Weights.Modules + fs.Weights.Rooms) <> 1m then
-            raise (ArgumentException ("Room and module fitness weightings must add up to 1."))
+        if (fs.Weights.Modules + fs.Weights.Rooms + fs.Weights.Lessons) <> 1m then
+            raise (ArgumentException ("Room, module and lesson fitness weightings must add up to 1."))
 
     static member Create fs ts = 
         TimetableFitnessCalculator (fs, ts) :> IFitnessCalculator<Timetable>
@@ -47,10 +54,15 @@ type TimetableFitnessCalculator (fs, ts) =
     interface IFitnessCalculator<Timetable> with
 
         member this.CalculateFitness timetable = 
+
+            let slots = 
+                flatten timetable
+
             [
-                (fs.Weights.Rooms, (roomFitness timetable));
-                (fs.Weights.Modules, (moduleFitness timetable));
+                (fs.Weights.Rooms, roomFitness);
+                (fs.Weights.Modules, moduleFitness);
+                (fs.Weights.Lessons, lessonFitness);
             ]
-            |> List.map (fun (w, f) -> w * f)
+            |> List.map (fun (w, f) -> w * (f slots))
             |> List.sum
             

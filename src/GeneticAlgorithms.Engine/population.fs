@@ -1,8 +1,11 @@
 ﻿namespace GeneticAlgorithms.Engine
 
 open System
+open System.Diagnostics
 
-type Population<'i> private (generationNo, individuals, fitnessCalculator : IFitnessCalculator<'i>, algorithm : IAlgorithm<'i>) = 
+[<Measure>] type ms
+
+type Population<'i> private (generationNo, generationTime : int64<ms>, individuals, fitnessCalculator : IFitnessCalculator<'i>, algorithm : IAlgorithm<'i>) = 
     
     let fittest = lazy (
         
@@ -21,10 +24,8 @@ type Population<'i> private (generationNo, individuals, fitnessCalculator : IFit
         individuals
         |> List.length
 
-    new (individuals, fitnessCalculator, algorithm) = Population (1, individuals, fitnessCalculator, algorithm)
-
     static member Create individuals fitnessCalculator algorithm =
-        Population (0, individuals, fitnessCalculator, algorithm)
+        Population (0, 0L<ms>, individuals, fitnessCalculator, algorithm)
 
     member this.Fitness = 
         fst (fittest.Force ())
@@ -35,7 +36,12 @@ type Population<'i> private (generationNo, individuals, fitnessCalculator : IFit
     member this.GenerationNo = 
         generationNo
 
+    member this.GenerationTime = 
+        generationTime
+
     member this.Evolve () = 
+
+        let stopwatch = Stopwatch.StartNew ()
 
         //In an elitist model we keep the fittest individual in every generation
         let conserved  = 
@@ -79,7 +85,11 @@ type Population<'i> private (generationNo, individuals, fitnessCalculator : IFit
             |> Array.Parallel.map algorithm.Mutate
             |> Array.toList
 
-        Population ((generationNo + 1), individuals', fitnessCalculator, algorithm)
+        stopwatch.Stop ()
+
+        let generationTime = (stopwatch.ElapsedMilliseconds * 1L<ms>)
+
+        Population ((generationNo + 1), generationTime, individuals', fitnessCalculator, algorithm)
 
 
     

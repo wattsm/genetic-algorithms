@@ -31,9 +31,9 @@ type Runner<'i> (settings : RunnerSettings, factory : IFactory<'i>, fitnessCalcu
         else
             None
 
-    let rec evolve (population : Population<'i>) (reporter : int -> 'i -> decimal -> unit) = 
+    let rec evolve (population : Population<'i>) (reporter : int -> int64<ms> -> 'i -> decimal -> unit) = 
 
-        reporter population.GenerationNo population.Fittest population.Fitness
+        reporter population.GenerationNo population.GenerationTime population.Fittest population.Fitness
 
         match population with
         | Complete result -> { Type = result; Fittest = population.Fittest; }

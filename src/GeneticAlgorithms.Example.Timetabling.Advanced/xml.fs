@@ -7,16 +7,21 @@ module Xml =
 
     let writeEvent (writer : XmlWriter) settings (event : Event)  = 
 
-        let groupCode = 
-            settings.Modules
-            |> List.find (fun m -> m.ModuleCode = event.ModuleCode)
-            |> (fun m -> m.GroupCode)
+        let moduleGroupCode = 
+            Modules.getGroupCode settings event.ModuleCode
+
+        let lessonGroupCode = 
+            Lessons.getGroupCode settings event.ModuleCode event.LessonCode            
         
         writer.WriteStartElement "Event"
         writer.WriteElementString ("Module", event.ModuleCode)
 
-        match groupCode with
-        | Some code -> writer.WriteElementString ("Group", code)
+        match moduleGroupCode with
+        | Some code -> writer.WriteElementString ("ModuleGroup", code)
+        | _ -> ()
+
+        match lessonGroupCode with
+        | Some code -> writer.WriteElementString ("LessonGroup", code)
         | _ -> ()
 
         writer.WriteElementString ("Lesson", event.LessonCode)
@@ -27,6 +32,7 @@ module Xml =
     let writeSlot (writer : XmlWriter) settings (slot : Slot) = 
 
         let moduleClashes = Modules.moduleClashes settings slot
+        let lessonClashes = Lessons.lessonClashes settings slot
         let roomClashes = Rooms.roomClashes slot
 
         writer.WriteStartElement "Slot"
@@ -34,6 +40,9 @@ module Xml =
 
         if (moduleClashes > 0) then
             writer.WriteAttributeString ("ModuleClashes", (string moduleClashes))
+
+        if (lessonClashes > 0) then
+            writer.WriteAttributeString ("LessonClashes", (string lessonClashes))
 
         if (roomClashes > 0) then
             writer.WriteAttributeString ("RoomClashes", (string roomClashes))

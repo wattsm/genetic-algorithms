@@ -1,8 +1,56 @@
 ﻿namespace GeneticAlgorithms.Example.Timetabling.Advanced
 
 open System
+open System.Collections.Generic
 
 module Lessons = 
+
+    let getGroupCode = 
+
+        let cache = Dictionary<_,_> ()
+
+        fun settings moduleCode lessonCode ->
+            
+            let key = String.Format ("{0}-{1}", moduleCode, lessonCode)
+
+            if (cache.ContainsKey key) then
+                cache.[key]
+            else
+
+                let code = 
+                    settings.Modules
+                    |> List.find (fun m -> m.ModuleCode = moduleCode)
+                    |> (fun m -> m.Lessons)
+                    |> List.find (fun l -> l.LessonCode = lessonCode)
+                    |> (fun l -> l.GroupCode)
+
+                cache.Add (key, code)
+
+                code
+
+    let lessonClashes settings slot = 
+
+        let events' =
+            slot.Events
+            |> List.toSeq
+
+        let count moduleCode = 
+            events'
+            |> Seq.choose (fun event ->
+                        
+                    if (event.ModuleCode = moduleCode) then
+                        Some (getGroupCode settings moduleCode event.LessonCode)
+                    else
+                        None
+
+                )
+            |> Seq.distinct
+            |> Seq.length
+
+        events'
+        |> Seq.map (fun event -> event.ModuleCode)
+        |> Seq.distinct
+        |> Seq.sumBy (fun code -> (count code) - 1) //Events can't clash with themselves
 
     let countLessons (modules : Module list) = 
         modules
@@ -45,21 +93,28 @@ module Lessons =
                 getGroupLessons ls groupCode
             else
                 l :: (getGroupLessons ls groupCode)
-        
-    let organiseLessons weekNo settings = 
 
-        let activeLessons = 
-            (activeLessonsFor weekNo settings)
+    let createLessonGroups (lessons : Lesson list) = 
 
         let ungrouped =
-            activeLessons
+            lessons
             |> List.filter (fun l -> l.GroupCode = None) 
             |> List.map (fun l -> l :: [])          
             
         let grouped = 
-            (getGroupCodes activeLessons)
-            |> List.map (getGroupLessons activeLessons)
+            (getGroupCodes lessons)
+            |> List.map (getGroupLessons lessons)
 
         List.append ungrouped grouped
         
+    let organiseWeekLessons weekNo settings = 
+        activeLessonsFor weekNo settings
+        |> createLessonGroups
+
+    let organiseLessons weekNo lessons = 
+        lessons
+        |> List.filter (isActiveFor weekNo)
+        |> createLessonGroups
+
+    
         

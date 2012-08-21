@@ -3,14 +3,39 @@
 open System
 open GeneticAlgorithms.Engine
 
+type MutationStrategy = 
+    | ByWeek
+    | ByModule
+
 type AlgorithmSettings = {
     IsElitist : Boolean;
     TournamentSize : int;
     TimetableSettings : TimetableSettings;
     FitnessCalculator : IFitnessCalculator<Timetable>;
+    Strategy : MutationStrategy;
 }
 
 type TimetableAlgorithm (settings : AlgorithmSettings)  =
+
+    let mutateByWeek timetable =
+
+            let weekNo = random timetable.StartWeek timetable.EndWeek
+            let week = Scheduling.addLessonEvents settings.TimetableSettings (Week.Empty weekNo settings.TimetableSettings)
+
+            Timetables.replaceWeek timetable week
+
+    let mutateByModule =     
+        
+        let module' = 
+            randomItem settings.TimetableSettings.Modules
+
+        let removeEvents = 
+            Scheduling.removeModuleEvents module'.ModuleCode
+
+        let addEvents =
+            Scheduling.addModuleEvents settings.TimetableSettings module'
+
+        removeEvents >> addEvents
 
     static member Create settings = 
         TimetableAlgorithm (settings) :> IAlgorithm<Timetable>
@@ -38,13 +63,15 @@ type TimetableAlgorithm (settings : AlgorithmSettings)  =
 
         member this.Mutate timetable = 
 
-            //Random reschedule a week
-            if (random 1 15) = 1 then
+            //Random reschedule a week (1/20 chance)
+            if (randomChoice 0.05m) then
 
-                let weekNo = random timetable.StartWeek timetable.EndWeek
-                let week = Scheduling.addEventsTo settings.TimetableSettings (Week.Empty weekNo settings.TimetableSettings)
+                let mutator = 
+                    match settings.Strategy with
+                    | ByWeek ->  mutateByWeek
+                    | ByModule -> mutateByModule
 
-                Timetables.replaceWeek timetable week
+                mutator timetable
 
             else
                 timetable

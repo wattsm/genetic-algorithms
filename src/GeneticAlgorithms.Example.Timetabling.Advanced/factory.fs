@@ -15,5 +15,5 @@ type TimetableFactory (settings : TimetableSettings) =
 
         member this.Create () = 
             [for weekNo in settings.StartWeek .. settings.EndWeek -> Week.Empty weekNo settings]
-            |> List.map (Scheduling.addEventsTo settings)
+            |> List.map (Scheduling.addLessonEvents settings)
             |> List.fold Timetables.replaceWeek (Timetable.Empty settings)
