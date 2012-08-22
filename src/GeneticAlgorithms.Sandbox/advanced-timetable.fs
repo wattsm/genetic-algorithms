@@ -7,6 +7,7 @@ open System.Diagnostics
 open GeneticAlgorithms.Engine
 open GeneticAlgorithms.Example.Timetabling.Advanced
 open GeneticAlgorithms.Example.Timetabling.Advanced.Xml
+open GeneticAlgorithms.Example.Timetabling.Advanced.Metrics
 
 module AdvancedTimetable = 
 
@@ -28,7 +29,7 @@ module AdvancedTimetable =
         path   
 
     let report generationNo generationTime timetable fitness = 
-        printfn "Generation %A (time = %A ms, fitness = %5.5M)" generationNo generationTime fitness
+        printfn "Generation %A (time = %4A ms, fitness = %5.5M)" generationNo generationTime fitness
 
     let run () =
 
@@ -63,9 +64,9 @@ module AdvancedTimetable =
 
         printfn "Done."
         printfn "   # modules = %A" numberOfModules
-        printfn "   # lessons = %A" (Lessons.countLessons modules)
-        printfn "   # locations = %A" (Locations.countLocations locations)
-        printfn "   # rooms = %A" (Rooms.countRooms locations)
+        printfn "   # lessons = %A" (Counts.countLessons modules)
+        printfn "   # locations = %A" (Counts.countLocations locations)
+        printfn "   # rooms = %A" (Counts.countRooms locations)
 
         let timetableSettings = {
             Modules = modules;
@@ -78,11 +79,14 @@ module AdvancedTimetable =
         let fitnessSettings = {
             Weights = 
                 {
-                    Rooms = 0.3m;
+                    Rooms = 0.5m;
                     Modules = 0.25m;
-                    Lessons = 0.45m
+                    Lessons = 0.25m
                 };
         }
+
+        let denormalisedSettings = 
+            Denormalised.getSettings timetableSettings
 
         let factory =
             TimetableFactory.Create timetableSettings
@@ -103,7 +107,7 @@ module AdvancedTimetable =
 
         let runnerSettings = {
             PopulationSize = populationSize;
-            MaxGenerations = 20;
+            MaxGenerations = 60;
             AcceptableFitness = 0.9m;
         }
 
@@ -122,9 +126,9 @@ module AdvancedTimetable =
         printfn "Result = %A (%A ms)" result.Type (stopwatch.ElapsedMilliseconds * 1L<ms>)
 
         printfn "Fitness = %M" (calculator.CalculateFitness result.Fittest)
-        printfn "   # module clashes = %A" (Timetables.moduleClashes timetableSettings result.Fittest)
-        printfn "   # lesson clashes = %A" (Timetables.lessonClashes timetableSettings result.Fittest)
-        printfn "   # room clashes = %A" (Timetables.roomClashes result.Fittest)
+        printfn "   # module clashes = %A" (Clashes.clashesByTimetable denormalisedSettings result.Fittest Clashes.moduleClashesBySlot)
+        printfn "   # lesson clashes = %A" (Clashes.clashesByTimetable denormalisedSettings result.Fittest Clashes.lessonClashesBySlot)
+        printfn "   # room clashes = %A" (Clashes.clashesByTimetable denormalisedSettings result.Fittest Clashes.roomClashesBySlot)
 
         if outputXml then
             printfn "Writing XML timetable..."

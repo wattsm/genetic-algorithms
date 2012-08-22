@@ -33,6 +33,7 @@
     <DocumentationFile>bin\Release\GeneticAlgorithms.Example.Timetabling.Advanced.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FSharp.PowerPack.Parallel.Seq, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a19089b1c74d0809" />
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
@@ -53,12 +54,8 @@
     <Compile Include="common.fs" />
     <Compile Include="input-data.fs" />
     <Compile Include="output-data.fs" />
-    <Compile Include="rooms.fs" />
-    <Compile Include="locations.fs" />
-    <Compile Include="lessons.fs" />
-    <Compile Include="modules.fs" />
-    <Compile Include="timetables.fs" />
-    <Compile Include="internal-data.fs" />
+    <Compile Include="denormalised-data.fs" />
+    <Compile Include="metrics.fs" />
     <Compile Include="xml.fs" />
     <Compile Include="fitness.fs" />
     <Compile Include="scheduling.fs" />

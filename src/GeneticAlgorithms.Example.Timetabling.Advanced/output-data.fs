@@ -10,13 +10,14 @@ type Event = {
 }
 
 type Slot = {
+    UniqueId : Guid;
     SlotNo : int;
     Events : Event list;
 }
 with
 
     static member Empty slotNo = 
-        { SlotNo = slotNo; Events = []; }
+        { UniqueId  = Guid.Empty; SlotNo = slotNo; Events = []; }
 
 type WeekDay = {
     Day : DayOfWeek;
@@ -47,6 +48,7 @@ with
         { WeekNo = weekNo; Days = days; }
 
 type Timetable = {
+    UniqueId : Guid;
     StartWeek : int;
     EndWeek : int;
     Weeks : Week list;
@@ -61,4 +63,4 @@ with
         let weeks = 
             List.init size (fun offset -> Week.Empty (settings.StartWeek + offset) settings)
 
-        { StartWeek = settings.StartWeek; EndWeek = settings.EndWeek; Weeks = weeks; }
+        { UniqueId = Guid.Empty; StartWeek = settings.StartWeek; EndWeek = settings.EndWeek; Weeks = weeks; }

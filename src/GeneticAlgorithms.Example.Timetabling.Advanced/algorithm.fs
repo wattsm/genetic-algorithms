@@ -23,9 +23,9 @@ type TimetableAlgorithm (settings : AlgorithmSettings)  =
     let mutateByWeek timetable =
 
             let weekNo = random timetable.StartWeek timetable.EndWeek
-            let week = Scheduling.addLessonEvents settings.TimetableSettings settings' (Week.Empty weekNo settings.TimetableSettings)
+            let week = Scheduling.addLessonEvents settings' (Week.Empty weekNo settings.TimetableSettings)
 
-            Timetables.replaceWeek timetable week
+            Scheduling.replaceWeek timetable week
 
     let mutateByModule =     
         
@@ -36,7 +36,7 @@ type TimetableAlgorithm (settings : AlgorithmSettings)  =
             Scheduling.removeModuleEvents module'.ModuleCode
 
         let addEvents =
-            Scheduling.addModuleEvents settings.TimetableSettings settings' module'
+            Scheduling.addModuleEvents settings' module'
 
         removeEvents >> addEvents
 
@@ -62,11 +62,11 @@ type TimetableAlgorithm (settings : AlgorithmSettings)  =
                 |> List.zip timetable2.Weeks
                 |> List.map pick
 
-            { timetable1 with Weeks = weeks; }
+            { timetable1 with UniqueId = Guid.NewGuid (); Weeks = weeks; }
 
         member this.Mutate timetable = 
 
-            //Random reschedule a week (1/20 chance)
+            //Random reschedule a week or module (1/20 chance)
             if (randomChoice 0.05m) then
 
                 let mutator = 
@@ -74,7 +74,7 @@ type TimetableAlgorithm (settings : AlgorithmSettings)  =
                     | ByWeek ->  mutateByWeek
                     | ByModule -> mutateByModule
 
-                mutator timetable
+                { (mutator timetable) with UniqueId = Guid.NewGuid() ;}
 
             else
                 timetable

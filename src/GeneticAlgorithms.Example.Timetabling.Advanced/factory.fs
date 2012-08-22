@@ -2,7 +2,6 @@
 
 open System
 open GeneticAlgorithms.Engine
-open GeneticAlgorithms.Example.Timetabling.Advanced.Timetables
 
 type TimetableFactory (settings : TimetableSettings) =
 
@@ -17,6 +16,10 @@ type TimetableFactory (settings : TimetableSettings) =
     interface IFactory<Timetable> with
 
         member this.Create () = 
-            [for weekNo in settings.StartWeek .. settings.EndWeek -> Week.Empty weekNo settings]
-            |> List.map (Scheduling.addLessonEvents settings settings')
-            |> List.fold Timetables.replaceWeek (Timetable.Empty settings)
+
+            let timetable = 
+                [for weekNo in settings.StartWeek .. settings.EndWeek -> Week.Empty weekNo settings]
+                |> List.map (Scheduling.addLessonEvents settings')
+                |> List.fold Scheduling.replaceWeek (Timetable.Empty settings)
+
+            { timetable with UniqueId = Guid.NewGuid (); }

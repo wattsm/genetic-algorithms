@@ -1,24 +1,17 @@
 ﻿namespace GeneticAlgorithms.Engine
 
 open System
+open Microsoft.FSharp.Collections
 open System.Diagnostics
 
 [<Measure>] type ms
 
 type Population<'i> private (generationNo, generationTime : int64<ms>, individuals, fitnessCalculator : IFitnessCalculator<'i>, algorithm : IAlgorithm<'i>) = 
     
-    let fittest = lazy (
-        
-        let pick i1 i2 = 
-            if (fst i1) > (fst i2) then
-                i1
-            else
-                i2
-
-        individuals 
-        |> List.map (fun i -> (fitnessCalculator.CalculateFitness i, i))
-        |> List.reduce pick
-    )
+    let fittest = 
+        individuals
+        |> PSeq.map (fun i -> (fitnessCalculator.CalculateFitness i, i))
+        |> PSeq.maxBy fst
 
     let size = 
         individuals
@@ -28,10 +21,10 @@ type Population<'i> private (generationNo, generationTime : int64<ms>, individua
         Population (0, 0L<ms>, individuals, fitnessCalculator, algorithm)
 
     member this.Fitness = 
-        fst (fittest.Force ())
+        fst fittest
 
     member this.Fittest = 
-        snd (fittest.Force ())
+        snd fittest
 
     member this.GenerationNo = 
         generationNo
@@ -46,7 +39,7 @@ type Population<'i> private (generationNo, generationTime : int64<ms>, individua
         //In an elitist model we keep the fittest individual in every generation
         let conserved  = 
             match algorithm.IsElitist with
-            | true -> Some (snd (fittest.Force ()))
+            | true -> Some this.Fittest
             | false -> None
 
         //Cross over the population, choosing individuals via tournament selection

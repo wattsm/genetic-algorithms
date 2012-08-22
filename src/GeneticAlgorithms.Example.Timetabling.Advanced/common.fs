@@ -11,7 +11,7 @@ module Common =
         rnd.Next (min, (max + 1))
 
     let randomChoice (freq : decimal) = 
-        (random 1 100) >= int (freq * 100m)
+        (random 1 100) <= int (freq * 100m)
 
     let (--) i = 
         i - 1
