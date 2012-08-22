@@ -67,7 +67,9 @@ type TimetableAlgorithm (settings : AlgorithmSettings)  =
         member this.Mutate timetable = 
 
             //Random reschedule a week or module (1/20 chance)
-            if (randomChoice 0.05m) then
+            let mutate = (randomChoice 0.05m)
+
+            if mutate then
 
                 let mutator = 
                     match settings.Strategy with

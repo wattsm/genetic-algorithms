@@ -1,17 +1,35 @@
 ﻿namespace GeneticAlgorithms.Example.Timetabling.Advanced          
 
 open System
+open System.Threading
+
+type RandomWrapper private () = 
+
+    static let seed =
+        Environment.TickCount
+
+    static let threadLocalRandom = 
+        new ThreadLocal<Random>(fun () -> 
+
+                let seed' = Interlocked.Increment (ref seed)
+        
+                Random (seed')
+            )
+
+    static member GetRandom () =
+        threadLocalRandom.Value
 
 [<AutoOpen>]
 module Common = 
 
-    let private rnd = Random (Environment.TickCount)
-
     let random min max = 
+            
+        let rnd = RandomWrapper.GetRandom ()
+
         rnd.Next (min, (max + 1))
 
     let randomChoice (freq : decimal) = 
-        (random 1 100) <= int (freq * 100m)
+        decimal (random 1 100) <= (freq * 100m)
 
     let (--) i = 
         i - 1
