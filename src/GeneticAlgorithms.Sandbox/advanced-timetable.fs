@@ -107,7 +107,7 @@ module AdvancedTimetable =
 
         let runnerSettings = {
             PopulationSize = populationSize;
-            MaxGenerations = 60;
+            MaxGenerations = 100;
             AcceptableFitness = 0.9m;
         }
 

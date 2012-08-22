@@ -21,7 +21,7 @@ module Scheduling =
             timetable.Weeks
             |> replaceItem week (fun week' -> week'.WeekNo = week.WeekNo)
 
-        { timetable with Weeks = weeks; }
+        { timetable with UniqueId = Guid.NewGuid (); Weeks = weeks; }
 
     let replaceDay week day = 
 
@@ -94,7 +94,7 @@ module Scheduling =
         let removeWeekEvents week = 
             { week with Days = (List.map removeDayEvents week.Days); }
 
-        { timetable with Weeks = (List.map removeWeekEvents timetable.Weeks); }
+        { timetable with UniqueId = Guid.NewGuid (); Weeks = (List.map removeWeekEvents timetable.Weeks); }
 
     let addModuleEvents (settings : Denormalised.Settings) (module' : Module) (timetable : Timetable)  = 
 
@@ -103,4 +103,4 @@ module Scheduling =
             |> List.filter (fun group -> group.ModuleCode = module'.ModuleCode)
             |> List.fold (addGroupedEvents settings) week
         
-        { timetable with Weeks = (List.map addWeekLessons timetable.Weeks); }
+        { timetable with UniqueId = Guid.NewGuid (); Weeks = (List.map addWeekLessons timetable.Weeks); }
