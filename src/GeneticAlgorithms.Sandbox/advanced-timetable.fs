@@ -33,7 +33,7 @@ module AdvancedTimetable =
 
     let run () =
 
-        let numberOfModules = 100
+        let numberOfModules = 10
         let numberOfLocations = (numberOfModules / 2)
         let numberOfModuleGroups = (numberOfModules / 5)
         let outputXml = false

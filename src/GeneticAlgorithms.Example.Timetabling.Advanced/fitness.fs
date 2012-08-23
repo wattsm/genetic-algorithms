@@ -20,8 +20,8 @@ type FitnessSettings = {
 [<AutoOpen>]
 module private Fitness = 
 
-    ///Calculates the fitness rating given to a slot based on the room capacity
-    let capacityFitness = 
+    ///Calculates the number of events with insufficiently large rooms
+    let insufficientCapacityCount = 
         memoisedBySlot (fun settings slot -> 
             slot.Events
             |> PSeq.map (fun event -> 
@@ -34,16 +34,12 @@ module private Fitness =
 
                     (classSize, capacity)
                 )
-            |> PSeq.averageBy (fun (classSize, capacity) -> 
-                    if (classSize <= capacity) then
-                        1m
-                    else
-                        0m
-                )
+            |> PSeq.filter (fun (classSize, capacity) -> classSize > capacity)
+            |> PSeq.length
         )
 
-    //Calculates the room type fitness based on what room type a lesson requires and what it has been assigned
-    let roomTypeFitness = 
+    //Calculates the number of rooms which are not of the type required by the lesson
+    let invalidRoomTypeCount = 
         memoisedBySlot (fun settings slot -> 
             slot.Events
             |> PSeq.map (fun event ->
@@ -56,12 +52,8 @@ module private Fitness =
 
                     (expected, actual)
                 )
-            |> PSeq.averageBy (fun (expected, actual) ->
-                    if (expected = actual) then
-                        1m
-                    else
-                        0m
-                )
+            |> PSeq.filter (fun (expected, actual) -> expected <> actual)
+            |> PSeq.length
         )
 
     ///Calculates the fitness rating given the number of clashes
@@ -70,6 +62,15 @@ module private Fitness =
             1m
         else
             1m / (decimal numClashes)
+
+    //Calculate fitness as a percentage of the number of events
+    let eventPercentageFitness slot (unfitCount : int) = 
+        
+        let eventCount = decimal (List.length slot.Events)
+        let unfitCount' = decimal unfitCount
+
+        ((eventCount - unfitCount') / eventCount) * 100m
+
 
 type TimetableFitnessCalculator (fs, ts) = 
 
@@ -90,18 +91,22 @@ type TimetableFitnessCalculator (fs, ts) =
 
     let roomFitness slot = //TODO Weight these factors
         [
-            ((Clashes.roomClashesBySlot settings) >> clashFitness);
-            (capacityFitness settings);
-            (roomTypeFitness settings);
+            ((Clashes.roomClashesBySlot settings) >> (eventPercentageFitness slot));
+            ((insufficientCapacityCount settings) >> (eventPercentageFitness slot));
+            ((invalidRoomTypeCount settings) >> (eventPercentageFitness slot));
         ]
         |> List.map (fun f -> f slot)
         |> List.average
 
-    let moduleFitness = 
-        (Clashes.moduleClashesBySlot settings) >> clashFitness
-
-    let lessonFitness = 
-        (Clashes.lessonClashesBySlot settings) >> clashFitness
+    let moduleFitness slot =
+        slot
+        |> (Clashes.moduleClashesBySlot settings)
+        |> (eventPercentageFitness slot)
+     
+    let lessonFitness slot = 
+        slot
+        |> (Clashes.lessonClashesBySlot settings)
+        |> (eventPercentageFitness slot)
 
     let slotFitness slot =
         [
