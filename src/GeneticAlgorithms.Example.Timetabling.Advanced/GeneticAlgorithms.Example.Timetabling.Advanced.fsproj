@@ -54,6 +54,7 @@
     <Compile Include="common.fs" />
     <Compile Include="input-data.fs" />
     <Compile Include="output-data.fs" />
+    <Compile Include="memoisation.fs" />
     <Compile Include="denormalised-data.fs" />
     <Compile Include="metrics.fs" />
     <Compile Include="xml.fs" />

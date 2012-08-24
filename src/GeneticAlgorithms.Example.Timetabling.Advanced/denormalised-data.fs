@@ -22,25 +22,10 @@ module Denormalised =
         GroupedModules : (string * string) list;
         GroupedLessons : (string * string) list;
         ClassSizes : (string * int) list;
-    }
-
-    let private memoiseLookup (f : Settings -> 'k -> 'v) = 
-
-        let cache = Dictionary<_,_> ()
-        let cacheLock = new Object ()
-
-        fun settings key ->
-            if not (cache.ContainsKey key) then
-                lock cacheLock (fun () ->
-                        if not (cache.ContainsKey key) then
-
-                            cache.Add (key, (f settings key))
-                    )
-
-            cache.[key]
+    }    
             
     let getClassSize =
-        memoiseLookup (fun settings moduleCode -> 
+        memoised (fun settings moduleCode -> 
 
                 settings.ClassSizes
                 |> List.find (fun (moduleCode', _) -> moduleCode' = moduleCode)
@@ -49,7 +34,7 @@ module Denormalised =
             )
 
     let getCapacity = 
-        memoiseLookup (fun settings roomCode -> 
+        memoised (fun settings roomCode -> 
 
                 settings.RoomCapacities
                 |> List.find (fun (roomCode', _) -> roomCode' = roomCode)
@@ -58,7 +43,7 @@ module Denormalised =
             )
 
     let getRoomType =
-        memoiseLookup (fun settings roomCode -> 
+        memoised (fun settings roomCode -> 
                 
                 settings.RoomTypes
                 |> List.find (fun (roomCode', _) -> roomCode' = roomCode)
@@ -66,7 +51,7 @@ module Denormalised =
             )
 
     let getLessonRoomType = 
-        memoiseLookup (fun settings lessonCode ->
+        memoised (fun settings lessonCode ->
 
                 settings.LessonRoomTypes
                 |> List.find (fun (lessonCode', _) -> lessonCode' = lessonCode)

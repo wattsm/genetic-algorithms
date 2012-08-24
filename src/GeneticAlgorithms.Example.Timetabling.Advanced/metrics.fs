@@ -5,25 +5,7 @@ open System.Collections.Generic
 open System.Diagnostics
 open Microsoft.FSharp.Collections
 
-module Metrics = 
-
-    let memoisedBySlot (f : Denormalised.Settings -> Slot -> 'a) = 
-
-        let cache = Dictionary<_,_> ()
-        let cacheLock = new Object ()
-
-        fun settings (slot : Slot) ->
-            if not (cache.ContainsKey slot.UniqueId) then
-                lock cacheLock (fun () ->
-                        if not (cache.ContainsKey slot.UniqueId) then
-
-                            cache.Add (slot.UniqueId, (f settings slot))
-
-                    )
-
-            cache.[slot.UniqueId]
-
-            
+module Metrics =     
 
     let private getGroupCode groupCodes itemCode = 
         groupCodes
@@ -58,7 +40,7 @@ module Metrics =
 
         ///A room clash is a room being used more than once in a slot
         let roomClashesBySlot = 
-            memoisedBySlot (fun _ slot ->
+            memoisedBySlot (fun (_ : Denormalised.Settings) slot ->
                     slot.Events
                     |> PSeq.countBy (fun event -> event.RoomCode)
                     |> PSeq.sumBy getClashCount
@@ -66,7 +48,7 @@ module Metrics =
 
         ///A module clash is two or more events from different modules that are in the same group in the same slot
         let moduleClashesBySlot = 
-            memoisedBySlot (fun settings slot -> 
+            memoisedBySlot (fun (settings : Denormalised.Settings) slot -> 
 
                     let getGroupCode' moduleCode = 
                         getGroupCode settings.GroupedModules moduleCode
@@ -81,7 +63,7 @@ module Metrics =
 
         ///A lesson clash is when two or more lessons from the same module but in different lesson groups are in the same slot
         let lessonClashesBySlot = 
-            memoisedBySlot (fun settings slot -> 
+            memoisedBySlot (fun (settings : Denormalised.Settings) slot -> 
 
                     let getGroupCode' event = 
                         getGroupCode settings.GroupedLessons event.LessonCode

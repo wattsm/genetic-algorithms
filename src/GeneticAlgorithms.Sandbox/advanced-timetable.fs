@@ -33,7 +33,7 @@ module AdvancedTimetable =
 
     let run () =
 
-        let numberOfModules = 10
+        let numberOfModules = 100
         let numberOfLocations = (numberOfModules / 2)
         let numberOfModuleGroups = (numberOfModules / 5)
         let outputXml = false
@@ -79,9 +79,11 @@ module AdvancedTimetable =
         let fitnessSettings = {
             Weights = 
                 {
-                    Rooms = 0.5m;
-                    Modules = 0.25m;
-                    Lessons = 0.25m
+                    RoomClash = 0.2m;
+                    ModuleClash = 0.3m;
+                    LessonClash = 0.3m;
+                    RoomCapacity = 0.1m;
+                    RoomType = 0.1m;
                 };
         }
 
@@ -92,7 +94,7 @@ module AdvancedTimetable =
             TimetableFactory.Create timetableSettings
 
         let calculator = 
-            TimetableFitnessCalculator.Create fitnessSettings timetableSettings
+            TimetableFitnessCalculator (fitnessSettings, timetableSettings)
 
         let algorithmSettings = {
             IsElitist = true;
@@ -100,6 +102,7 @@ module AdvancedTimetable =
             FitnessCalculator = calculator;
             TournamentSize = tournamentSize;
             Strategy = ByWeek;
+            MutationFrequency = 0.65m;
         }
 
         let algorithm = 
@@ -108,7 +111,7 @@ module AdvancedTimetable =
         let runnerSettings = {
             PopulationSize = populationSize;
             MaxGenerations = 100;
-            AcceptableFitness = 0.9m;
+            AcceptableFitness = 90m;
         }
 
         printfn "Beginning evolution..."
@@ -125,10 +128,7 @@ module AdvancedTimetable =
 
         printfn "Result = %A (%A ms)" result.Type (stopwatch.ElapsedMilliseconds * 1L<ms>)
 
-        printfn "Fitness = %M" (calculator.CalculateFitness result.Fittest)
-        printfn "   # module clashes = %A" (Clashes.clashesByTimetable denormalisedSettings result.Fittest Clashes.moduleClashesBySlot)
-        printfn "   # lesson clashes = %A" (Clashes.clashesByTimetable denormalisedSettings result.Fittest Clashes.lessonClashesBySlot)
-        printfn "   # room clashes = %A" (Clashes.clashesByTimetable denormalisedSettings result.Fittest Clashes.roomClashesBySlot)
+        printfn "Fitness = %A" (calculator.GetReport result.Fittest)
 
         if outputXml then
             printfn "Writing XML timetable..."

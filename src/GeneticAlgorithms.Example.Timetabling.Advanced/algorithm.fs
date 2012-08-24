@@ -13,6 +13,7 @@ type AlgorithmSettings = {
     TimetableSettings : TimetableSettings;
     FitnessCalculator : IFitnessCalculator<Timetable>;
     Strategy : MutationStrategy;
+    MutationFrequency : decimal;
 }
 
 type TimetableAlgorithm (settings : AlgorithmSettings)  =
@@ -66,8 +67,7 @@ type TimetableAlgorithm (settings : AlgorithmSettings)  =
 
         member this.Mutate timetable = 
 
-            //Random reschedule a week or module (1/20 chance)
-            let mutate = (randomChoice 0.05m)
+            let mutate = (randomChoice settings.MutationFrequency)
 
             if mutate then
 
